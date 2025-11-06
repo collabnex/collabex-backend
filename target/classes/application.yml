@@ -1,22 +1,28 @@
+server:
+  port: 8080
+
 spring:
   datasource:
     url: jdbc:mysql://localhost:3306/collabnex?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
     password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
   jpa:
     hibernate:
-      ddl-auto: validate
+      ddl-auto: update            # ✅ auto-create / update tables as needed
     properties:
       hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
         jdbc.time_zone: UTC
+        show_sql: true            # 👀 optional for debugging queries
+    open-in-view: false            # 🚫 prevents lazy-loading memory leaks
+
   flyway:
-    enabled: true
+    enabled: false                 # ✅ disabled during Hibernate schema updates
     locations: classpath:db/migration
     baseline-on-migrate: true
-
-server:
-  port: 8080
 
 app:
   security:
@@ -24,7 +30,15 @@ app:
       issuer: collabnex
       expiration-minutes: 60
       secret: zvV8eQkN93@w#tRj!cLzP2nTxhS6uYeM4oQvA1rD9kB7fGxW8n
+
   cors:
-    allowed-origins: "http://localhost:5173,http://localhost:3000"
+    # ✅ Include localhost + your LAN IP (for testing on phone)
+    allowed-origins: >
+      http://localhost:8081,
+      http://localhost:3000,
+      http://192.168.1.:8081,        # ← replace with your actual PC IP
+      http://192.168.1.7:19006,       # Expo web
+      exp://192.168.1.7:19000         # Expo Go app
     allowed-methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
     allowed-headers: "*"
+    allow-credentials: true           # ✅ allow cookies / JWTs if needed
