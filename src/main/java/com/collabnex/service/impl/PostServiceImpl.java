@@ -23,7 +23,7 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public Post create(User author, String content) {
-        Post p = Post.builder().author(author).content(content).build();
+        Post p = Post.builder().author(author).content(content).commentsCount(0).likesCount(0).build();
         return postRepository.save(p);
     }
 
