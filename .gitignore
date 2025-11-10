@@ -1,0 +1,19 @@
+### Spring Boot target ###
+/target/
+!/target/.keep
+
+### Logs ###
+/logs/
+*.log
+
+
+### IDE files ###
+*.iml
+.idea/
+.vscode/
+.project
+.settings/
+
+### OS junk ###
+.DS_Store
+Thumbs.db

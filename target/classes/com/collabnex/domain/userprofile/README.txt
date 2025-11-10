@@ -1,1 +1,0 @@
-Extension of user domain for managing user profile.

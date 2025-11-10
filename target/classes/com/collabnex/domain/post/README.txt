@@ -1,1 +1,0 @@
-Entities: Post, PostComment, PostLike, repositories for each.
