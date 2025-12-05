@@ -1,3 +1,9 @@
+### Sensitive Spring Config ###
+application.yml
+application.properties
+application-*.yml
+application-*.properties
+
 ### Spring Boot target ###
 /target/
 !/target/.keep
@@ -6,14 +12,21 @@
 /logs/
 *.log
 
-
 ### IDE files ###
 *.iml
 .idea/
 .vscode/
 .project
+.classpath
 .settings/
+.factorypath
+
+### Build ###
+/build/
 
 ### OS junk ###
 .DS_Store
 Thumbs.db
+
+### Test outputs ###
+/out/
