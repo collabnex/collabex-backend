@@ -1,33 +1,42 @@
-
 package com.collabnex.domain.market;
 
 import com.collabnex.domain.user.User;
 import jakarta.persistence.*;
 import lombok.*;
-import java.time.Instant;
 
+import java.time.Instant;
+import java.util.List;
 @Entity
 @Table(name = "orders")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor @Builder
 public class Order {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional=false) @JoinColumn(name="buyer_user_id")
-    private User buyer;
+    // Buyer
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
-    @Column(nullable=false, length=16)
-    private String status;
+    /* Shipping Details */
+    private String fullName;
+    private String phoneNumber;
+    private String addressLine1;
+    private String addressLine2;
+    private String landmark;
+    private String pincode;
+    private String city;
+    private String state;
+    private String country;
 
-    @Column(name="subtotal_minor", nullable=false) private Long subtotalMinor = 0L;
-    @Column(name="discount_minor", nullable=false) private Long discountMinor = 0L;
-    @Column(name="total_minor", nullable=false) private Long totalMinor = 0L;
-    @Column(nullable=false, length=3) private String currency;
+    @Column(nullable = false)
+    private String currency = "INR";
 
-    @Column(name="created_at", nullable=false, updatable=false)
-    private Instant createdAt;
-    @Column(name="updated_at", nullable=false) private Instant updatedAt;
+    @Column(nullable = false)
+    private Instant createdAt = Instant.now();
 
-    @PrePersist public void pre(){ Instant now = Instant.now(); createdAt = now; updatedAt = now; }
-    @PreUpdate public void up(){ updatedAt = Instant.now(); }
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
+    private List<OrderItem> items;
 }

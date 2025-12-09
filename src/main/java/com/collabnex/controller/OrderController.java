@@ -1,17 +1,23 @@
-
 package com.collabnex.controller;
 
-import com.collabnex.common.dto.ApiResponse;
-import com.collabnex.domain.market.Order;
-import com.collabnex.domain.user.User;
-import com.collabnex.service.OrderService;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import java.util.List;
+
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.collabnex.common.dto.order.AllOrdersResponse;
+import com.collabnex.common.dto.order.OrderRequest;
+import com.collabnex.common.dto.order.OrderResponse;
+import com.collabnex.domain.market.Order;
+import com.collabnex.domain.market.OrderItem;
+import com.collabnex.security.JwtUtil;
+import com.collabnex.service.OrderService;
+
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -21,14 +27,26 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Order>> create(@AuthenticationPrincipal User user, @RequestBody CreateOrder req) {
-        return ResponseEntity.ok(ApiResponse.ok(orderService.createSimpleOrder(user, req.getArtworkId(), req.getQty())));
+    public ResponseEntity<Order> placeOrder(@RequestBody OrderRequest request) {
+        Long userId = JwtUtil.getLoggedInUserId();
+        return ResponseEntity.ok(orderService.placeOrder(userId, request));
     }
 
-    @GetMapping("/me")
-    public ResponseEntity<ApiResponse<Page<Order>>> mine(@AuthenticationPrincipal User user, Pageable pageable) {
-        return ResponseEntity.ok(ApiResponse.ok(orderService.myOrders(user, pageable)));
+    @GetMapping("/my")
+    public ResponseEntity<List<OrderResponse>> getMyOrders() {
+        Long userId = JwtUtil.getLoggedInUserId();
+        return ResponseEntity.ok(orderService.getOrdersByUser(userId));
+    }
+    @GetMapping("/all")
+    public ResponseEntity<AllOrdersResponse> getAllOrders() {
+        Long userId = JwtUtil.getLoggedInUserId();
+        return ResponseEntity.ok(orderService.getAllOrders(userId));
     }
 
-    @Data public static class CreateOrder { private Long artworkId; private Integer qty = 1; }
+
+    @GetMapping("/received")
+    public ResponseEntity<List<OrderItem>> getOrdersReceived() {
+        Long sellerId = JwtUtil.getLoggedInUserId();
+        return ResponseEntity.ok(orderService.getOrdersReceived(sellerId));
+    }
 }

@@ -1,12 +1,18 @@
-
 package com.collabnex.service;
 
+import com.collabnex.common.dto.order.AllOrdersResponse;
+import com.collabnex.common.dto.order.OrderRequest;
+import com.collabnex.common.dto.order.OrderResponse;
 import com.collabnex.domain.market.Order;
-import com.collabnex.domain.user.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.collabnex.domain.market.OrderItem;
+import java.util.List;
 
 public interface OrderService {
-    Order createSimpleOrder(User buyer, Long artworkId, Integer qty);
-    Page<Order> myOrders(User buyer, Pageable pageable);
+
+    Order placeOrder(Long userId, OrderRequest request);
+    AllOrdersResponse getAllOrders(Long userId);
+
+
+    public List<OrderResponse> getOrdersByUser(Long userId);
+    List<OrderItem> getOrdersReceived(Long sellerId); // orders for MY products
 }
