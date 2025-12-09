@@ -52,9 +52,5 @@ public class ServiceEnquiryServiceImpl implements ServiceEnquiryService {
     }
 
 
-	@Override
-	public List<ServiceEnquiry> getMyServiceEnquiries(Long userId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 }
