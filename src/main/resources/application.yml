@@ -44,3 +44,11 @@ app:
     allowed-methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
     allowed-headers: "*"
     allow-credentials: true           # ✅ allow cookies / JWTs if needed
+
+aws:
+  accessKey: 
+  secretKey: 
+  region: eu-north-1
+  s3:
+    bucket: nidhi-demo-s3-2025
+    presign-expiry-minutes: 10
