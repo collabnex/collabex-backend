@@ -45,9 +45,10 @@ app:
     allowed-headers: "*"
     allow-credentials: true           # ✅ allow cookies / JWTs if needed
 
+
 aws:
-  accessKey: 
-  secretKey: 
+  accessKey: ${AWS_ACCESS_KEY}
+  secretKey: ${AWS_SECRET_KEY} 
   region: eu-north-1
   s3:
     bucket: nidhi-demo-s3-2025
