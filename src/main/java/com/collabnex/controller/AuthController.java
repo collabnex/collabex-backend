@@ -31,24 +31,34 @@ public class AuthController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> register(
             @Valid @RequestBody RegisterRequest req) {
 
-        
-
-        User user = userService.registerLocal(req.getFullName(), req.getEmail(), req.getPassword());
-
-        String token = jwtService.generateToken(
-                user.getEmail(),
-                Map.of("role", user.getRole().name(), "uid", user.getId())
+        User user = userService.registerLocal(
+                req.getFullName(),
+                req.getEmail(),
+                req.getPassword()
         );
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.ok(Map.of(
-                "message", "User registered successfully",
-                "token", token,
-                "user", Map.of(
-                        "id", user.getId(),
-                        "email", user.getEmail(),
-                        "role", user.getRole().name()
+        String accessToken = jwtService.generateAccessToken(
+                user.getEmail(),
+                Map.of(
+                        "role", user.getRole().name(),
+                        "uid", user.getId()
                 )
-        )));
+        );
+
+        String refreshToken = jwtService.generateRefreshToken(user.getEmail());
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+                ApiResponse.ok(Map.of(
+                        "message", "User registered successfully",
+                        "accessToken", accessToken,
+                        "refreshToken", refreshToken,
+                        "user", Map.of(
+                                "id", user.getId(),
+                                "email", user.getEmail(),
+                                "role", user.getRole().name()
+                        )
+                ))
+        );
     }
 
     // ================= LOGIN =================
@@ -59,23 +69,34 @@ public class AuthController {
         User user = userService.getByEmail(req.getEmail());
 
         if (!passwordEncoder.matches(req.getPassword(), user.getPasswordHash())) {
-            throw new BusinessException("Invalid email or password", HttpStatus.UNAUTHORIZED);
+            throw new BusinessException(
+                    "Invalid email or password",
+                    HttpStatus.UNAUTHORIZED
+            );
         }
 
-        String token = jwtService.generateToken(
+        String accessToken = jwtService.generateAccessToken(
                 user.getEmail(),
-                Map.of("role", user.getRole().name(), "uid", user.getId())
+                Map.of(
+                        "role", user.getRole().name(),
+                        "uid", user.getId()
+                )
         );
 
-        return ResponseEntity.ok(ApiResponse.ok(Map.of(
-                "message", "Login successful",
-                "token", token,
-                "user", Map.of(
-                        "id", user.getId(),
-                        "email", user.getEmail(),
-                        "role", user.getRole().name()
-                )
-        )));
+        String refreshToken = jwtService.generateRefreshToken(user.getEmail());
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(Map.of(
+                        "message", "Login successful",
+                        "accessToken", accessToken,
+                        "refreshToken", refreshToken,
+                        "user", Map.of(
+                                "id", user.getId(),
+                                "email", user.getEmail(),
+                                "role", user.getRole().name()
+                        )
+                ))
+        );
     }
 
     // ================= DTOs =================

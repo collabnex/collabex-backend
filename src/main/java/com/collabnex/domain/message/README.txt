@@ -1,1 +1,0 @@
-Entities: MessageThread, Message, ThreadParticipant, etc.

@@ -32,6 +32,7 @@ public class UserServiceImpl implements UserService {
         user = userRepository.save(user);
         UserProfile profile = UserProfile.builder()
                 .user(user).fullName(fullName).build();
+        profile.setDomain("un_registered");
         profileRepository.save(profile);
         return user;
     }

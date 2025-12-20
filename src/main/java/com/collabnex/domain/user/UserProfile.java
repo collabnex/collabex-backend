@@ -25,6 +25,9 @@ public class UserProfile {
     @Column(name = "full_name", nullable = false, length = 160)
     private String fullName;
 
+    @Column(name = "domain", nullable = false, length = 160)
+    private String domain;
+    
     @Column(columnDefinition = "TEXT")
     private String bio;
 
