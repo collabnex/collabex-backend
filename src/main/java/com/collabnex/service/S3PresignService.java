@@ -3,6 +3,7 @@ package com.collabnex.service;
 import java.time.Duration;
 import java.util.UUID;
 
+import com.collabnex.dto.PresignedUrlResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -13,45 +14,51 @@ import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequ
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
 
 @Service
-@Profile("aws") 
+@Profile("aws")
 public class S3PresignService {
 
-    private final S3Presigner presigner;
+        private final S3Presigner presigner;
 
-    @Value("${aws.s3.bucket}")
-    private String bucket;
+        @Value("${aws.s3.bucket}")
+        private String bucket;
 
-    @Value("${aws.s3.presign-expiry-minutes}")
-    private long expiryMinutes;
+        @Value("${aws.region}")
+        private String region;
 
-    public S3PresignService(S3Presigner presigner) {
-        this.presigner = presigner;
-    }
+        @Value("${aws.s3.presign-expiry-minutes}")
+        private long expiryMinutes;
 
-    // ✅ THIS METHOD MUST EXIST
-    public String generatePresignedUrl(String contentType) {
+        public S3PresignService(S3Presigner presigner) {
+                this.presigner = presigner;
+        }
 
-        String key = "images/" + UUID.randomUUID() + ".jpg";
+        // ✅ FIXED METHOD
+        public PresignedUrlResponse generatePresignedUrl(String contentType) {
 
-        PutObjectRequest putObjectRequest = PutObjectRequest.builder()
-                .bucket(bucket)
-                .key(key)
-                .contentType(contentType)
-                .build();
+                // 1️⃣ Generate RELATIVE PATH (THIS GOES IN DB)
+                String key = "images/" + UUID.randomUUID() + ".jpg";
 
-        PutObjectPresignRequest presignRequest =
-                PutObjectPresignRequest.builder()
-                        .signatureDuration(Duration.ofMinutes(expiryMinutes))
-                        .putObjectRequest(putObjectRequest)
-                        .build();
+                // 2️⃣ Create PUT request
+                PutObjectRequest putObjectRequest = PutObjectRequest.builder()
+                                .bucket(bucket)
+                                .key(key)
+                                .contentType(contentType)
+                                .build();
 
-        PresignedPutObjectRequest presignedRequest =
-                presigner.presignPutObject(presignRequest);
+                // 3️⃣ Presign
+                PutObjectPresignRequest presignRequest = PutObjectPresignRequest.builder()
+                                .signatureDuration(Duration.ofMinutes(expiryMinutes))
+                                .putObjectRequest(putObjectRequest)
+                                .build();
 
-        return presignedRequest.url().toString();
-    }
+                PresignedPutObjectRequest presignedRequest = presigner.presignPutObject(presignRequest);
+
+                // 4️⃣ Public file URL (for preview)
+                String fileUrl = "https://" + bucket + ".s3." + region + ".amazonaws.com/" + key;
+
+                return new PresignedUrlResponse(
+                                presignedRequest.url().toString(), // uploadUrl
+                                key // images/uuid.jpg
+                );
+        }
 }
-
-
-
-
