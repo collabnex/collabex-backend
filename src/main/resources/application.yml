@@ -3,6 +3,9 @@ server:
   port: 8080
 
 spring:
+  profiles:
+    active: dev
+
   datasource:
     url: jdbc:mysql://localhost:3306/collabnex?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
     username: root
@@ -11,17 +14,17 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update            # ✅ auto-create / update tables as needed
+      ddl-auto: update # ✅ auto-create / update tables as needed
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
         jdbc.time_zone: UTC
-        show_sql: true            # 👀 optional for debugging queries
-    open-in-view: false            # 🚫 prevents lazy-loading memory leaks
+        show_sql: true # 👀 optional for debugging queries
+    open-in-view: false # 🚫 prevents lazy-loading memory leaks
 
   flyway:
-    enabled: false                 # ✅ disabled during Hibernate schema updates
+    enabled: false # ✅ disabled during Hibernate schema updates
     locations: classpath:db/migration
     baseline-on-migrate: true
 
@@ -29,7 +32,8 @@ app:
   security:
     jwt:
       issuer: collabnex
-      expiration-minutes: 60
+      access-token-expiration-minutes: 15
+      refresh-token-expiration-days: 30
       secret: zvV8eQkN93@w#tRj!cLzP2nTxhS6uYeM4oQvA1rD9kB7fGxW8n
 
   cors:
@@ -43,12 +47,11 @@ app:
       http://192.168.1.7:8081
     allowed-methods: "GET,POST,PUT,PATCH,DELETE,OPTIONS"
     allowed-headers: "*"
-    allow-credentials: true           # ✅ allow cookies / JWTs if needed
-
+    allow-credentials: true # ✅ allow cookies / JWTs if needed
 
 aws:
   accessKey: ${AWS_ACCESS_KEY}
-  secretKey: ${AWS_SECRET_KEY} 
+  secretKey: ${AWS_SECRET_KEY}
   region: eu-north-1
   s3:
     bucket: nidhi-demo-s3-2025
