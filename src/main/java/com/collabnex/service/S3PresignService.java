@@ -1,5 +1,6 @@
 package com.collabnex.service;
 
+import com.collabnex.dto.PresignedUrlResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -18,6 +19,9 @@ public class S3PresignService {
     @Value("${aws.s3.bucket}")
     private String bucket;
 
+    @Value("${aws.region}")
+    private String region;
+
     @Value("${aws.s3.presign-expiry-minutes}")
     private long expiryMinutes;
 
@@ -25,17 +29,20 @@ public class S3PresignService {
         this.presigner = presigner;
     }
 
-    // ✅ THIS METHOD MUST EXIST
-    public String generatePresignedUrl(String contentType) {
+    // ✅ FIXED METHOD
+    public PresignedUrlResponse generatePresignedUrl(String contentType) {
 
+        // 1️⃣ Generate RELATIVE PATH (THIS GOES IN DB)
         String key = "images/" + UUID.randomUUID() + ".jpg";
 
+        // 2️⃣ Create PUT request
         PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                 .bucket(bucket)
                 .key(key)
                 .contentType(contentType)
                 .build();
 
+        // 3️⃣ Presign
         PutObjectPresignRequest presignRequest =
                 PutObjectPresignRequest.builder()
                         .signatureDuration(Duration.ofMinutes(expiryMinutes))
@@ -45,10 +52,12 @@ public class S3PresignService {
         PresignedPutObjectRequest presignedRequest =
                 presigner.presignPutObject(presignRequest);
 
-        return presignedRequest.url().toString();
+        // 4️⃣ Public file URL (for preview)
+        String fileUrl = "https://" + bucket + ".s3." + region + ".amazonaws.com/" + key;
+
+        return new PresignedUrlResponse(
+                presignedRequest.url().toString(), // uploadUrl
+                key                                // images/uuid.jpg
+        );
     }
 }
-
-
-
-
