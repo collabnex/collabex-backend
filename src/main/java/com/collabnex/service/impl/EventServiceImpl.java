@@ -54,18 +54,30 @@ public class EventServiceImpl implements EventService {
                 .stream().map(this::toDto).toList();
     }
 
+//    @Override
+//    public Event getEventById(Long eventId) {
+//        return eventRepo.findById(eventId)
+//                .orElseThrow(() -> new RuntimeException("Event not found"));
+//    }
+
     @Override
-    public Event getEventById(Long eventId) {
-        return eventRepo.findById(eventId)
+    public EventResponse getEventResponseById(Long eventId) {
+        Event event = eventRepo.findById(eventId)
                 .orElseThrow(() -> new RuntimeException("Event not found"));
+        return toDto(event);
     }
+
 
     private EventResponse toDto(Event e) {
         EventResponse dto = new EventResponse();
         dto.setId(e.getId());
         dto.setTitle(e.getTitle());
         dto.setDescription(e.getDescription());
-        dto.setEventType(e.getEventType().name());
+//        dto.setEventType(e.getEventType().name());
+        dto.setEventType(
+                e.getEventType() != null ? e.getEventType().name() : null
+        );
+
         dto.setStartDatetime(e.getStartDatetime());
         dto.setTicketPrice(e.getTicketPrice());
         dto.setAvailableSeats(e.getAvailableSeats());

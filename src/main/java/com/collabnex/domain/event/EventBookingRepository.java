@@ -9,4 +9,7 @@ public interface EventBookingRepository extends JpaRepository<EventBooking, Long
     List<EventBooking> findByUserId(Long userId);
 
     List<EventBooking> findByEventHostId(Long hostId);
+
+
+
 }

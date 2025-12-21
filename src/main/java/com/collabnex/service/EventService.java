@@ -6,6 +6,17 @@ import com.collabnex.domain.event.Event;
 
 import java.util.List;
 
+//public interface EventService {
+//
+//    Event createEvent(Long hostId, EventCreateRequest request);
+//
+//    List<EventResponse> getAllEvents();
+//
+//    List<EventResponse> getMyEvents(Long hostId);
+//
+//    Event getEventById(Long eventId);
+//}
+
 public interface EventService {
 
     Event createEvent(Long hostId, EventCreateRequest request);
@@ -14,5 +25,5 @@ public interface EventService {
 
     List<EventResponse> getMyEvents(Long hostId);
 
-    Event getEventById(Long eventId);
+    EventResponse getEventResponseById(Long eventId);
 }

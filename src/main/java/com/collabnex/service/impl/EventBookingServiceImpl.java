@@ -55,13 +55,29 @@ public class EventBookingServiceImpl implements EventBookingService {
                 .stream().map(this::toDto).toList();
     }
 
-    private EventBookingResponse toDto(EventBooking b) {
-        EventBookingResponse dto = new EventBookingResponse();
-        dto.setBookingId(b.getId());
+//    private EventBookingResponse toDto(EventBooking b) {
+//        EventBookingResponse dto = new EventBookingResponse();
+//        dto.setBookingId(b.getId());
+//        dto.setEventId(b.getEvent().getId());
+//        dto.setEventTitle(b.getEvent().getTitle());
+//        dto.setTicketPrice(b.getTicketPrice());
+//        dto.setBookedAt(b.getCreatedAt());
+//        return dto;
+//    }
+private EventBookingResponse toDto(EventBooking b) {
+    EventBookingResponse dto = new EventBookingResponse();
+
+    dto.setBookingId(b.getId());
+
+    if (b.getEvent() != null) {
         dto.setEventId(b.getEvent().getId());
         dto.setEventTitle(b.getEvent().getTitle());
-        dto.setTicketPrice(b.getTicketPrice());
-        dto.setBookedAt(b.getCreatedAt());
-        return dto;
     }
+
+    dto.setTicketPrice(b.getTicketPrice());
+    dto.setBookedAt(b.getCreatedAt());
+
+    return dto;
+}
+
 }
