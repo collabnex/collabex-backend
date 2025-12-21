@@ -31,9 +31,6 @@ public class UserProfile {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
-    @Column(columnDefinition = "JSON")
-    private String skills; // e.g. ["Spring Boot", "UI Design"]
-
     @Column(name = "profile_image_url", length = 512)
     private String profileImageUrl;
 
@@ -53,9 +50,15 @@ public class UserProfile {
 
     @Column(name = "hourly_rate")
     private Double hourlyRate; // e.g. 45.0 (USD/hour or INR/hour depending on config)
+    @Transient
+    private Double distanceKm;
 
-    @Column(name = "tags", columnDefinition = "JSON")
-    private String tags; // e.g. ["freelancer", "collaboration", "remote"]
+    @Column(columnDefinition = "TEXT")
+    private String skills; // JSON array → ["Spring Boot","Angular"]
+
+    @Column(columnDefinition = "TEXT")
+    private String tags;   // JSON array → ["AI","SaaS"]
+
 
     /* ---------- Location Fields ---------- */
 

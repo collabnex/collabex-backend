@@ -37,30 +37,14 @@ public class UserProfileController {
     }
 
     @PutMapping("/me")
-    public ResponseEntity<ApiResponse<UserProfile>> update(
+    public ResponseEntity<ApiResponse<UserProfile>> updateMyProfile(
             @AuthenticationPrincipal User user,
             @RequestBody Map<String, Object> body
     ) {
-        try {
-            UserProfile payload = new UserProfile();
-
-            payload.setBio((String) body.get("bio"));
-            payload.setCity((String) body.get("city"));
-            payload.setProfession((String) body.get("profession"));
-
-            // ✅ KEY FIX: convert array → JSON string
-            if (body.get("skills") != null) {
-                payload.setSkills(objectMapper.writeValueAsString(body.get("skills")));
-            }
-
-            return ResponseEntity.ok(
-                    ApiResponse.ok(service.updateMyProfile(user, payload))
-            );
-
-        } catch (Exception e) {
-            throw new RuntimeException("Invalid profile payload", e);
-        }
+        UserProfile updated = service.updateMyProfile(user, body);
+        return ResponseEntity.ok(ApiResponse.ok(updated));
     }
+
     
     @PutMapping("/me/domain")
     public ResponseEntity<ApiResponse<UserProfile>> updateDomain(
@@ -84,26 +68,33 @@ public class UserProfileController {
             @RequestParam(required = false) String city
     ) {
 
+        // ✅ domain + city
         if (domain != null && city != null) {
             return ResponseEntity.ok(
-                ApiResponse.ok(service.findByDomainAndCity(domain, city))
+                    ApiResponse.ok(service.findByDomainAndCity(domain, city))
             );
         }
 
+        // ✅ domain only
         if (domain != null) {
             return ResponseEntity.ok(
-                ApiResponse.ok(service.findByDomain(domain))
+                    ApiResponse.ok(service.findByDomain(domain))
             );
         }
 
+        // ✅ city only
         if (city != null) {
             return ResponseEntity.ok(
-                ApiResponse.ok(service.findByCity(city))
+                    ApiResponse.ok(service.findByCity(city))
             );
         }
 
-        return ResponseEntity.ok(ApiResponse.ok(List.of()));
+        // ✅ NEW: return ALL ARTISTS
+        return ResponseEntity.ok(
+                ApiResponse.ok(service.findAllArtists())
+        );
     }
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<UserProfile>> getArtistProfile(
             @PathVariable Long userId
@@ -111,5 +102,29 @@ public class UserProfileController {
         UserProfile profile = service.getPublicProfileByUserId(userId);
         return ResponseEntity.ok(ApiResponse.ok(profile));
     }
+
+    @GetMapping("/nearby")
+    public ResponseEntity<ApiResponse<List<UserProfile>>> nearby(
+            @AuthenticationPrincipal User user,
+            @RequestParam(required = false) Double lat,
+            @RequestParam(required = false) Double lng
+    ) {
+        // ✅ If lat/lng not provided → use my profile
+        if (lat == null || lng == null) {
+            UserProfile me = service.getMyProfile(user);
+
+            if (me.getLatitude() == null || me.getLongitude() == null) {
+                throw new IllegalArgumentException("Location not set for user");
+            }
+
+            lat = me.getLatitude();
+            lng = me.getLongitude();
+        }
+
+        return ResponseEntity.ok(
+                ApiResponse.ok(service.findNearbyArtists(lat, lng))
+        );
+    }
+
 
 }
