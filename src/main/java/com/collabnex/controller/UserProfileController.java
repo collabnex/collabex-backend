@@ -1,16 +1,25 @@
 package com.collabnex.controller;
 
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.collabnex.common.dto.ApiResponse;
 import com.collabnex.domain.user.User;
 import com.collabnex.domain.user.UserProfile;
 import com.collabnex.service.UserProfileService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.*;
 
-import java.util.Map;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -69,5 +78,38 @@ public class UserProfileController {
         );
     }
 
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<UserProfile>>> searchArtists(
+            @RequestParam(required = false) String domain,
+            @RequestParam(required = false) String city
+    ) {
+
+        if (domain != null && city != null) {
+            return ResponseEntity.ok(
+                ApiResponse.ok(service.findByDomainAndCity(domain, city))
+            );
+        }
+
+        if (domain != null) {
+            return ResponseEntity.ok(
+                ApiResponse.ok(service.findByDomain(domain))
+            );
+        }
+
+        if (city != null) {
+            return ResponseEntity.ok(
+                ApiResponse.ok(service.findByCity(city))
+            );
+        }
+
+        return ResponseEntity.ok(ApiResponse.ok(List.of()));
+    }
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<ApiResponse<UserProfile>> getArtistProfile(
+            @PathVariable Long userId
+    ) {
+        UserProfile profile = service.getPublicProfileByUserId(userId);
+        return ResponseEntity.ok(ApiResponse.ok(profile));
+    }
 
 }

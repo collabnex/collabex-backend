@@ -1,13 +1,18 @@
 
 package com.collabnex.service.impl;
 
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import com.collabnex.common.exception.ResourceNotFoundException;
 import com.collabnex.domain.user.User;
 import com.collabnex.domain.user.UserProfile;
 import com.collabnex.domain.user.UserProfileRepository;
 import com.collabnex.service.UserProfileService;
+
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -89,5 +94,31 @@ public class UserProfileServiceImpl implements UserProfileService {
 
 		return updated;
 	}
+	
+	  @Override
+	    public List<UserProfile> findByCity(String city) {
+	        return profileRepo.findByCityIgnoreCase(city);
+	    }
+
+	    @Override
+	    public List<UserProfile> findByDomain(String domain) {
+	        return profileRepo.findByDomainIgnoreCase(domain);
+	    }
+
+	    @Override
+	    public List<UserProfile> findByDomainAndCity(String domain, String city) {
+	        return profileRepo.findByDomainIgnoreCaseAndCityIgnoreCase(domain, city);
+	    }
+	
+	    @Override
+	    public UserProfile getPublicProfileByUserId(Long userId) {
+	        return profileRepo.findByUserId(userId)
+	                .orElseThrow(() ->
+	                        new ResourceNotFoundException(
+	                                "Artist profile not found for userId: " + userId
+	                        )
+	                );
+	    }
+	    
 
 }
