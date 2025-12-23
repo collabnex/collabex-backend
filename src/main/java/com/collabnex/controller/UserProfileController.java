@@ -64,52 +64,48 @@ public class UserProfileController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<UserProfile>>> searchArtists(
-            @RequestParam(required = false) String domain,
-            @RequestParam(required = false) String city
+            @RequestParam(name = "domain", required = false) String domain,
+            @RequestParam(name = "city", required = false) String city
     ) {
-
-        // ✅ domain + city
         if (domain != null && city != null) {
-            return ResponseEntity.ok(
-                    ApiResponse.ok(service.findByDomainAndCity(domain, city))
-            );
+            return ResponseEntity.ok(ApiResponse.ok(
+                    service.findByDomainAndCity(domain, city)
+            ));
         }
 
-        // ✅ domain only
         if (domain != null) {
-            return ResponseEntity.ok(
-                    ApiResponse.ok(service.findByDomain(domain))
-            );
+            return ResponseEntity.ok(ApiResponse.ok(
+                    service.findByDomain(domain)
+            ));
         }
 
-        // ✅ city only
         if (city != null) {
-            return ResponseEntity.ok(
-                    ApiResponse.ok(service.findByCity(city))
-            );
+            return ResponseEntity.ok(ApiResponse.ok(
+                    service.findByCity(city)
+            ));
         }
 
-        // ✅ NEW: return ALL ARTISTS
-        return ResponseEntity.ok(
-                ApiResponse.ok(service.findAllArtists())
-        );
+        return ResponseEntity.ok(ApiResponse.ok(
+                service.findAllArtists()
+        ));
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<ApiResponse<UserProfile>> getArtistProfile(
-            @PathVariable Long userId
+            @PathVariable("userId") Long userId
     ) {
         UserProfile profile = service.getPublicProfileByUserId(userId);
         return ResponseEntity.ok(ApiResponse.ok(profile));
     }
 
+
     @GetMapping("/nearby")
     public ResponseEntity<ApiResponse<List<UserProfile>>> nearby(
             @AuthenticationPrincipal User user,
-            @RequestParam(required = false) Double lat,
-            @RequestParam(required = false) Double lng
+            @RequestParam(name = "lat", required = false) Double lat,
+            @RequestParam(name = "lng", required = false) Double lng
     ) {
-        // ✅ If lat/lng not provided → use my profile
+        // If lat/lng not provided → fallback to my profile
         if (lat == null || lng == null) {
             UserProfile me = service.getMyProfile(user);
 
@@ -125,6 +121,7 @@ public class UserProfileController {
                 ApiResponse.ok(service.findNearbyArtists(lat, lng))
         );
     }
+
 
 
 }

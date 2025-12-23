@@ -26,7 +26,7 @@ public class ServiceEnquiryController {
 
     @PostMapping("/{serviceProductId}")
     public ResponseEntity<ServiceEnquiry> sendEnquiry(
-            @PathVariable Long serviceProductId,
+            @PathVariable (name ="serviceProductId") Long serviceProductId,
             @RequestBody Map<String, String> body) {
 
         Long senderUserId = JwtUtil.getLoggedInUserId();
